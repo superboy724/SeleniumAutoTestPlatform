@@ -8,6 +8,6 @@ namespace SeleniumAutoTestServer
 {
     public enum LogType
     {
-        Info,Warning,Error,Debug,AssertSuccess,AssertFailed,AssertError
+        Info,Warning,Error,Debug,AssertSuccess,AssertFailed,AssertError,Event
     }
 }

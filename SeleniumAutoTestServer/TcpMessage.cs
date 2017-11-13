@@ -24,6 +24,7 @@ namespace SeleniumAutoTestServer
                 case LogType.AssertSuccess : format = "AssertSuccess," + msg; break;
                 case LogType.AssertFailed: format = "AssertFailed," + msg; break;
                 case LogType.AssertError: format = "AssertError," + msg; break;
+                case LogType.Event: format = "Event" + msg; break;
             }
 
             NewMessage(this, new NewMessageArgs()
@@ -67,6 +68,11 @@ namespace SeleniumAutoTestServer
         public void AssertError()
         {
             this.Write(LogType.AssertError, "");
+        }
+
+        public void SendEvent(string eventName)
+        {
+            this.Write(LogType.Event, eventName);
         }
     }
 

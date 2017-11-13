@@ -38,29 +38,41 @@ namespace SeleniumAutoTestServer
             try
             {
                 //监听请求
-                LogManger.WriteInfo("Server is Listened");
+                LogManger.WriteInfo("Server is listening");
                 while(true)
                 {
                     var clientSocket = this.serverSocket.Accept();
                     LogManger.WriteInfo("New connect:" + clientSocket.RemoteEndPoint.ToString());
                     Thread clientThread = new Thread(new ParameterizedThreadStart((object param) => {
-                        var socket = param as Socket;
-                        //创建用户操作服务器的实例
-                        ServerManger serverManger = new ServerManger();
-                        //创建TCP消息上下文
-                        TcpMessage message = new TcpMessage();
-                        message.NewMessage += (object e, NewMessageArgs args) =>
+                        try
                         {
-                            socket.Send(Encoding.UTF8.GetBytes("MSG:" + args.FormatString));
-                        };
-                        serverManger.MessageContext = message;
-                        while (true)
+                            var socket = param as Socket;
+                            //创建用户操作服务器的实例
+                            ServerManger serverManger = new ServerManger();
+                            //创建TCP消息上下文
+                            TcpMessage message = new TcpMessage();
+                            message.NewMessage += (object e, NewMessageArgs args) =>
+                            {
+                                socket.Send(Encoding.UTF8.GetBytes("MSG:" + args.FormatString));
+                            };
+                            serverManger.MessageContext = message;
+                            while (true)
+                            {
+                                byte[] buffer = new byte[256];
+                                var length = socket.Receive(buffer);
+                                //断连
+                                if(length == 0)
+                                {
+                                    return;
+                                }
+                                string data = Encoding.UTF8.GetString(buffer);
+                                LogManger.WriteInfo(clientSocket.RemoteEndPoint.ToString() + ":" + data);
+                                socket.Send(Encoding.UTF8.GetBytes(Parse(data, serverManger)));
+                            }
+                        }
+                        catch(Exception ex)
                         {
-                            byte[] buffer = new byte[256];
-                            socket.Receive(buffer);
-                            string data = Encoding.UTF8.GetString(buffer);
-                            LogManger.WriteInfo(clientSocket.RemoteEndPoint.ToString() + ":" + data);
-                            socket.Send(Encoding.UTF8.GetBytes(Parse(data, serverManger)));
+                            LogManger.WriteError("Listen error:" + ex.ToString());
                         }
                     }));
                     clientThread.Start(clientSocket);
@@ -84,6 +96,7 @@ namespace SeleniumAutoTestServer
             string returnStr = command + ":";
             switch(command)
             {
+
                 case "GET": returnStr += string.Join(",", serverManger.GetTests());break;
                 case "RUN": 
                     if(serverManger.StartTest(args[0]))

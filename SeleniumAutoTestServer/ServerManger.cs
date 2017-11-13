@@ -72,6 +72,7 @@ namespace SeleniumAutoTestServer
                     {
                         IsRunningTest = false;
                     }
+                    MessageContext.SendEvent("TestComplete");
                 };
                 Thread t = new Thread(new ThreadStart(ServerTestInstance.Run));
                 t.Start();
