@@ -11,20 +11,20 @@ namespace SeleniumAutoTestServer
         public event NewMessageHandler NewMessage;
         public string TestCaseName { get; set; }
 
-        public void Write(LogType type, string msg)
+        public void Write(MessageType type, string msg)
         {
             string format = "";
 
             switch (type)
             {
-                case LogType.Info: format = "Info," + msg; break;
-                case LogType.Warning: format = "Warning," + msg; break;
-                case LogType.Debug: format = "Debug," + msg; break;
-                case LogType.Error: format = "Error," + msg; break;
-                case LogType.AssertSuccess : format = "AssertSuccess," + msg; break;
-                case LogType.AssertFailed: format = "AssertFailed," + msg; break;
-                case LogType.AssertError: format = "AssertError," + msg; break;
-                case LogType.Event: format = "Event" + msg; break;
+                case MessageType.Info: format = "Info," + msg; break;
+                case MessageType.Warning: format = "Warning," + msg; break;
+                case MessageType.Debug: format = "Debug," + msg; break;
+                case MessageType.Error: format = "Error," + msg; break;
+                case MessageType.AssertSuccess : format = "AssertSuccess," + msg; break;
+                case MessageType.AssertFailed: format = "AssertFailed," + msg; break;
+                case MessageType.AssertError: format = "AssertError," + msg; break;
+                case MessageType.Event: format = "Event," + msg; break;
             }
 
             NewMessage(this, new NewMessageArgs()
@@ -37,42 +37,42 @@ namespace SeleniumAutoTestServer
 
         public void Info(string msg)
         {
-            this.Write(LogType.Info, msg);
+            this.Write(MessageType.Info, msg);
         }
 
         public void Debug(string msg)
         {
-            this.Write(LogType.Debug, msg);
+            this.Write(MessageType.Debug, msg);
         }
 
         public void Warn(string msg)
         {
-            this.Write(LogType.Warning, msg);
+            this.Write(MessageType.Warning, msg);
         }
 
         public void Error(string msg)
         {
-            this.Write(LogType.Error, msg);
+            this.Write(MessageType.Error, msg);
         }
 
-        public void AssertSuccess()
+        public void AssertSuccess(string testCauseName,string testName,long usedTime)
         {
-            this.Write(LogType.AssertSuccess, "");
+            this.Write(MessageType.AssertSuccess, string.Format("{0},{1},{2}",testCauseName,testName,usedTime));
         }
 
-        public void AssertFailed()
+        public void AssertFailed(string testCauseName, string testName, long usedTime,string trueValue,string falseValue)
         {
-            this.Write(LogType.AssertFailed, "");
+            this.Write(MessageType.AssertFailed, string.Format("{0},{1},{2},{3},{4}", testCauseName, testName, usedTime,trueValue,falseValue));
         }
 
-        public void AssertError()
+        public void AssertError(string testCauseName, string testName)
         {
-            this.Write(LogType.AssertError, "");
+            this.Write(MessageType.AssertError, string.Format("{0},{1}", testCauseName, testName));
         }
 
-        public void SendEvent(string eventName)
+        public void SendEvent(string eventName,string[] args)
         {
-            this.Write(LogType.Event, eventName);
+            this.Write(MessageType.Event, eventName + "," + string.Join(",",args));
         }
     }
 
@@ -80,7 +80,7 @@ namespace SeleniumAutoTestServer
     {
         public string Msg { get; set; }
 
-        public LogType Type { get; set; }
+        public MessageType Type { get; set; }
 
         public string FormatString { get; set; }
     }

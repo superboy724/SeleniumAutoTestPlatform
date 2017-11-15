@@ -12,6 +12,10 @@ namespace SeleniumAutoTestCommon
 
         public long UsedTime { get; set; }
 
+        public string TrueValue { get; set; }
+
+        public string FalseValue { get; set; }
+
         public static Assert Success()
         {
             return new Assert()
@@ -41,6 +45,8 @@ namespace SeleniumAutoTestCommon
             {
                 return new Assert()
                 {
+                    TrueValue = left.ToString(),
+                    FalseValue = right.ToString(),
                     Result = AssestResult.Failed
                 };
             }
@@ -52,7 +58,9 @@ namespace SeleniumAutoTestCommon
             {
                 return new Assert()
                 {
-                    Result = AssestResult.Failed
+                    Result = AssestResult.Failed,
+                    TrueValue = "!=" + left.ToString(),
+                    FalseValue = right.ToString()
                 };
             }
             else

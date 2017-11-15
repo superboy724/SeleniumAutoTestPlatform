@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SeleniumAutoTestServer
 {
-    public enum LogType
+    public enum MessageType
     {
         Info,Warning,Error,Debug,AssertSuccess,AssertFailed,AssertError,Event
     }

@@ -41,9 +41,23 @@ namespace SeleniumAutoTestClient
             });
         }
 
-        public void Run()
+        /// <summary>
+        /// 启动服务
+        /// </summary>
+        /// <param name="testInstanceName"></param>
+        public void Run(string testInstanceName,Action<bool> runningStatusckb)
         {
-
+            Global.TcpClient.SendMessage("RUN", new string[] { testInstanceName }, (string[] status) =>
+            {
+                if(status[0] == "OK")
+                {
+                    runningStatusckb(true);
+                }
+                else
+                {
+                    runningStatusckb(false);
+                }
+            });
         }
 
         public void Disconnect()

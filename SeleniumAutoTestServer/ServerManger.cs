@@ -72,7 +72,7 @@ namespace SeleniumAutoTestServer
                     {
                         IsRunningTest = false;
                     }
-                    MessageContext.SendEvent("TestComplete");
+                    MessageContext.SendEvent("TestComplete",new string[]{ });
                 };
                 Thread t = new Thread(new ThreadStart(ServerTestInstance.Run));
                 t.Start();
@@ -95,7 +95,14 @@ namespace SeleniumAutoTestServer
         /// <returns></returns>
         public bool StopTest()
         {
-            return ServerTestInstance.Stop();
+            if (ServerTestInstance != null)
+            {
+                return ServerTestInstance.Stop();
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool DeleteTest(string testName)

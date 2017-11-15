@@ -25,7 +25,7 @@ namespace SeleniumAutoTestServer
 
         public event TestComleteHandle CompleteEvent;
 
-        public TcpMessage tcpMessageContext { get; set; }
+        private TcpMessage tcpMessageContext;
 
         public ServerTestInstance(TestInstance instance,string testName,TcpMessage messageContext)
         {
@@ -50,6 +50,10 @@ namespace SeleniumAutoTestServer
                     return;
                 }
             }
+            //告知客户端测试用例数量
+            this.tcpMessageContext.SendEvent("SetTestCauseCount", new string[] { testInstance.TestCases.Count().ToString() });
+            //告知客户端需要测试的平台数量
+            this.tcpMessageContext.SendEvent("SetPlatformCount", new string[] { testInstance.Platforms.Count().ToString() });
             //根据用户选择的平台每个平台都测试
             foreach (var item in testInstance.Platforms)
             {
@@ -73,9 +77,11 @@ namespace SeleniumAutoTestServer
 
         private void RunTestCase(TestCase testCase)
         {
-            LogManger.WriteInfo("Start test case:" + testCase.Name);
+            LogManger.WriteInfo("Start test case:" + testCase.Name + " Platform:" + nowDriver.ToString());
             IWebDriver driver = SetWebDriver(nowDriver);
             //开始子测试
+            //告知客户端当前正在进行的测试用例
+            this.tcpMessageContext.SendEvent("SetRunningTestCauseName", new string[] { testCase.Name });
             foreach(var item in testCase.Tests)
             {
                 lock (isStartLock)
@@ -85,7 +91,7 @@ namespace SeleniumAutoTestServer
                         break;
                     }
                 }
-                RunTest(item.Key, item.Value, driver);
+                RunTest(testCase.Name,item.Key, item.Value, driver);
             }
             //结束测试
             driver.Quit();
@@ -103,7 +109,7 @@ namespace SeleniumAutoTestServer
             }
         }
 
-        private void RunTest(string name,Func<IWebDriver,Log,Assert> testScript,IWebDriver chooseDriver)
+        private void RunTest(string testcauseName,string name,Func<IWebDriver,Log,Assert> testScript,IWebDriver chooseDriver)
         {
             lock(isStartLock)
             {
@@ -133,9 +139,9 @@ namespace SeleniumAutoTestServer
             //回报消息
             switch(assest.Result)
             {
-                case AssestResult.Error: tcpMessageContext.AssertError(); break;
-                case AssestResult.Success: tcpMessageContext.AssertSuccess(); break;
-                case AssestResult.Failed: tcpMessageContext.AssertFailed(); break;
+                case AssestResult.Error: tcpMessageContext.AssertError(testcauseName,name); break;
+                case AssestResult.Success: tcpMessageContext.AssertSuccess(testcauseName, name, assest.UsedTime); break;
+                case AssestResult.Failed: tcpMessageContext.AssertFailed(testcauseName, name, assest.UsedTime,assest.TrueValue,assest.FalseValue); break;
             }
             //结束
             LogManger.WriteTestLog("Test result:" + assest.Result + " Time:" + assest.UsedTime.ToString());

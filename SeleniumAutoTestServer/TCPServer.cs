@@ -44,16 +44,22 @@ namespace SeleniumAutoTestServer
                     var clientSocket = this.serverSocket.Accept();
                     LogManger.WriteInfo("New connect:" + clientSocket.RemoteEndPoint.ToString());
                     Thread clientThread = new Thread(new ParameterizedThreadStart((object param) => {
+                        bool sendMessage = true;
+                        //创建用户操作服务器的实例
+                        ServerManger serverManger = new ServerManger();
                         try
                         {
-                            var socket = param as Socket;
-                            //创建用户操作服务器的实例
-                            ServerManger serverManger = new ServerManger();
-                            //创建TCP消息上下文
                             TcpMessage message = new TcpMessage();
+                            var socket = param as Socket;
+                            
+                            //创建TCP消息上下文
                             message.NewMessage += (object e, NewMessageArgs args) =>
                             {
-                                socket.Send(Encoding.UTF8.GetBytes("MSG:" + args.FormatString));
+                                Thread.Sleep(20);
+                                if (sendMessage == true)
+                                {
+                                    socket.Send(Encoding.UTF8.GetBytes("MSG:" + args.FormatString));
+                                }
                             };
                             serverManger.MessageContext = message;
                             while (true)
@@ -72,6 +78,10 @@ namespace SeleniumAutoTestServer
                         }
                         catch(Exception ex)
                         {
+                            //强制停止
+                            serverManger.StopTest();
+                            //关闭送信开关
+                            sendMessage = false;
                             LogManger.WriteError("Listen error:" + ex.ToString());
                         }
                     }));

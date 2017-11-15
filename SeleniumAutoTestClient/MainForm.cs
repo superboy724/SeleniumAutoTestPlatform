@@ -40,5 +40,17 @@ namespace SeleniumAutoTestClient
                 //TODO:配置项为空的处理
             }
         }
+
+        private void lv_TestInstances_DoubleClick(object sender, EventArgs e)
+        {
+            string testInstanceName = lv_TestInstances.SelectedItems[0].SubItems[0].Text;
+            StartTest(testInstanceName);
+        }
+
+        private void StartTest(string testInstanceName)
+        {
+            TestForm testForm = new TestForm(testInstanceName);
+            testForm.ShowDialog();
+        }
     }
 }
