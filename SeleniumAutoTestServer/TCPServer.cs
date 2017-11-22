@@ -118,6 +118,17 @@ namespace SeleniumAutoTestServer
                         returnStr += "FAILED";
                     }
                     break;
+                case "STOP":
+                    if(serverManger.StopTest())
+                    {
+                        returnStr += "OK";
+                    }
+                    else
+                    {
+                        returnStr += "FAILED";
+                    }
+                    break;
+
             }
             return returnStr;
         }

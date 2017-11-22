@@ -82,6 +82,8 @@ namespace SeleniumAutoTestServer
             //开始子测试
             //告知客户端当前正在进行的测试用例
             this.tcpMessageContext.SendEvent("SetRunningTestCauseName", new string[] { testCase.Name });
+            //给客户端输出日志
+            this.tcpMessageContext.Info("Now running " + testCase.Name);
             foreach(var item in testCase.Tests)
             {
                 lock (isStartLock)
@@ -128,10 +130,10 @@ namespace SeleniumAutoTestServer
                 LogManger.WriteTestLog(args.FormatString);
                 switch(args.Type)
                 {
-                    case SeleniumAutoTestCommon.LogType.Warning: tcpMessageContext.Warn(args.Msg);break;
-                    case SeleniumAutoTestCommon.LogType.Debug: tcpMessageContext.Debug(args.Msg); break;
-                    case SeleniumAutoTestCommon.LogType.Info: tcpMessageContext.Info(args.Msg); break;
-                    case SeleniumAutoTestCommon.LogType.Error: tcpMessageContext.Error(args.Msg); break;
+                    case SeleniumAutoTestCommon.LogType.Warning: tcpMessageContext.Warn("From user ->" + args.Msg);break;
+                    case SeleniumAutoTestCommon.LogType.Debug: tcpMessageContext.Debug("From user ->" + args.Msg); break;
+                    case SeleniumAutoTestCommon.LogType.Info: tcpMessageContext.Info("From user ->" + args.Msg); break;
+                    case SeleniumAutoTestCommon.LogType.Error: tcpMessageContext.Error("From user ->" + args.Msg); break;
                 }
             };
             //开始

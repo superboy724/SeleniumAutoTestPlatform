@@ -40,6 +40,7 @@
             this.lb_TestCauseCount = new System.Windows.Forms.Label();
             this.lb_TestPlatformCount = new System.Windows.Forms.Label();
             this.lb_NowTestCauseName = new System.Windows.Forms.Label();
+            this.btn_Stop = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lv_TestResult
@@ -133,11 +134,22 @@
             this.lb_NowTestCauseName.TabIndex = 6;
             this.lb_NowTestCauseName.Text = "lb_NowTestCauseName";
             // 
+            // btn_Stop
+            // 
+            this.btn_Stop.Location = new System.Drawing.Point(852, 108);
+            this.btn_Stop.Name = "btn_Stop";
+            this.btn_Stop.Size = new System.Drawing.Size(117, 61);
+            this.btn_Stop.TabIndex = 7;
+            this.btn_Stop.Text = "停止当前测试";
+            this.btn_Stop.UseVisualStyleBackColor = true;
+            this.btn_Stop.Click += new System.EventHandler(this.btn_Stop_Click);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(975, 455);
+            this.Controls.Add(this.btn_Stop);
             this.Controls.Add(this.lb_NowTestCauseName);
             this.Controls.Add(this.lb_TestPlatformCount);
             this.Controls.Add(this.lb_TestCauseCount);
@@ -168,5 +180,6 @@
         private System.Windows.Forms.Label lb_TestCauseCount;
         private System.Windows.Forms.Label lb_TestPlatformCount;
         private System.Windows.Forms.Label lb_NowTestCauseName;
+        private System.Windows.Forms.Button btn_Stop;
     }
 }

@@ -60,6 +60,21 @@ namespace SeleniumAutoTestClient
             });
         }
 
+        public void Stop(Action<bool> stopStatusckb)
+        {
+            Global.TcpClient.SendMessage("STOP",null,(string[] status) =>
+            {
+                if (status[0] == "OK")
+                {
+                    stopStatusckb(true);
+                }
+                else
+                {
+                    stopStatusckb(false);
+                }
+            });
+        }
+
         public void Disconnect()
         {
             Global.TcpClient.Disconnect();

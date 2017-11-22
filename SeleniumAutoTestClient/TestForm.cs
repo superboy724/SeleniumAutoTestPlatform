@@ -44,6 +44,10 @@ namespace SeleniumAutoTestClient
                     case MessageType.AssertFailed: SetTestResultContent(args); break;
                     case MessageType.AssertSuccess: SetTestResultContent(args); break;
                     case MessageType.Event: EventMessageProcess(args); break;
+                    case MessageType.Debug: LogManger(args); break;
+                    case MessageType.Info: LogManger(args); break;
+                    case MessageType.Error: LogManger(args); break;
+                    case MessageType.Warning: LogManger(args); break;
                 }
             }));
         }
@@ -51,6 +55,10 @@ namespace SeleniumAutoTestClient
         private void btn_Run_Click(object sender, EventArgs e)
         {
             var loadForm = LoadingForm.GetLoad();
+            //清除过去的内容
+            lv_TestResult.Items.Clear();
+            //打开停止测试开关
+            btn_Stop.Enabled = true;
             Global.ClientManger.Run(testInstanceName,(bool status) => {
                 this.Invoke(new InvokeDelegate(() =>
                 {
@@ -103,12 +111,64 @@ namespace SeleniumAutoTestClient
                 case "SetTestCauseCount": lb_TestCauseCount.Text = "共计测试数量:" + args.MessageArgs[0]; break;
                 case "SetPlatformCount": lb_TestPlatformCount.Text = "需测试平台:" + args.MessageArgs[0]; break;
                 case "SetRunningTestCauseName": lb_NowTestCauseName.Text = "当前测试用例:" + args.MessageArgs[0]; break;
+                case "TestComplete": btn_Run.Enabled = true; btn_Stop.Enabled = false ; break;
             }
+        }
+
+        private void LogManger(NewMessageArgs args)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[" + DateTime.Now.ToString());
+            sb.Append(" " + args.Type.ToString());
+            sb.Append("]:");
+            if(args.MessageArgs == null)
+            {
+                sb.Append(args.Msg);
+            }
+            else
+            {
+                sb.Append(args.MessageArgs[0]);
+            }
+            tb_Log.AppendText(sb.ToString() + "\r\n");
         }
 
         private void TestForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Global.TcpClient.NewMessageEvent -= TcpClient_NewMessageEvent;
+        }
+
+        private void btn_Stop_Click(object sender, EventArgs e)
+        {
+            this.LogManger(new NewMessageArgs()
+            {
+                Type = MessageType.Info,
+                Msg = "正在停止测试"
+            });
+            btn_Stop.Enabled = false;
+            Global.ClientManger.Stop((bool status) =>
+            {
+                this.Invoke(new InvokeDelegate(()=>
+                {
+                    
+                    if (status)
+                    {
+                        this.LogManger(new NewMessageArgs()
+                        {
+                            Type = MessageType.Info,
+                            Msg = "测试已经开始停止"
+                        });
+                    }
+                    else
+                    {
+                        this.LogManger(new NewMessageArgs()
+                        {
+                            Type = MessageType.Warning,
+                            Msg = "测试停止失败,可能是测试已经停止"
+                        });
+                        btn_Stop.Enabled = true;
+                    }
+                }));
+            });
         }
     }
 }
